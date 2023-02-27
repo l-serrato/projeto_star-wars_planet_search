@@ -7,10 +7,12 @@ function MyProvider({ children }) {
 
   useEffect(() => {
     fetch('https://swapi.dev/api/planets')
-      .then((data) => {
-        const dataResults = data.results;
+      .then((data) => data.json())
+      .then((response) => {
+        const dataResults = response.results;
+        console.log(dataResults);
         setPlanets(dataResults);
-      });
+      })
   }, []);
 
   const context = {
