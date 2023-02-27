@@ -4,19 +4,35 @@ import MyContext from './MyContext';
 
 function MyProvider({ children }) {
   const [planets, setPlanets] = useState([]);
+  const [filterPlanets, setFilterPlanets] = useState([]);
+  const [filterName, setFilterName] = useState('');
 
   useEffect(() => {
     fetch('https://swapi.dev/api/planets')
       .then((data) => data.json())
       .then((response) => {
         const dataResults = response.results;
-        console.log(dataResults);
         setPlanets(dataResults);
       });
   }, []);
 
+  useEffect(() => {
+    if (filterName === '') {
+      setFilterPlanets(planets);
+    } else {
+      const planetsFilterName = planets
+        .filter((planet) => planet.name
+          .includes((filterName)));
+      setFilterPlanets(planetsFilterName);
+    }
+  }, [planets, filterName]);
+
   const context = {
     planets,
+    filterPlanets,
+    filterName,
+    setFilterName,
+    setFilterPlanets,
   };
 
   return (

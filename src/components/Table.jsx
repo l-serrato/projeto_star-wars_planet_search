@@ -2,9 +2,17 @@ import React, { useContext } from 'react';
 import MyContext from '../context/MyContext';
 
 export default function Table() {
-  const { planets } = useContext(MyContext);
+  const { filterPlanets, setFilterName } = useContext(MyContext);
   return (
     <section>
+      <label>
+        Search Planet:
+        <input
+          type="text"
+          data-testid="name-filter"
+          onChange={ ({ target: { value } }) => setFilterName(value) }
+        />
+      </label>
       <table>
         <thead>
           <tr>
@@ -24,7 +32,7 @@ export default function Table() {
           </tr>
         </thead>
         <tbody>
-          {planets?.map((planet, index1) => (
+          {filterPlanets?.map((planet, index1) => (
             <tr key={ index1 }>
               <td>
                 { planet.name }
