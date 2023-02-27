@@ -12,7 +12,7 @@ function MyProvider({ children }) {
         const dataResults = response.results;
         console.log(dataResults);
         setPlanets(dataResults);
-      })
+      });
   }, []);
 
   const context = {
