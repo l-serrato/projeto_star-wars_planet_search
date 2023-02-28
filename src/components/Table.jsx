@@ -1,18 +1,89 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import MyContext from '../context/MyContext';
 
 export default function Table() {
-  const { filterPlanets, setFilterName } = useContext(MyContext);
+  const {
+    filterPlanets,
+    setFilterName,
+    saveFilters } = useContext(MyContext);
+  const [planetData, setPlanetData] = useState('Population');
+  const [comparison, setComparison] = useState('Greater Than');
+  const [number, setNumber] = useState(0);
+  const handleClick = () => {
+    const info = {
+      planetData,
+      comparison,
+      number,
+    };
+    saveFilters(info);
+  };
   return (
     <section>
-      <label>
-        Search Planet:
-        <input
-          type="text"
-          data-testid="name-filter"
-          onChange={ ({ target: { value } }) => setFilterName(value) }
-        />
-      </label>
+      <header>
+        <label>
+          Search Planet:
+          <input
+            type="text"
+            data-testid="name-filter"
+            onChange={ ({ target: { value } }) => setFilterName(value) }
+          />
+        </label>
+        <label htmlFor="planetData">
+          Planet Data:
+          <select
+            data-testid="column-filter"
+            name="planetData"
+            id="planetData"
+            value={ planetData }
+            onChange={ (e) => setPlanetData(e.target.value) }
+          >
+            <option value="population">Population</option>
+            <option value="orbital_period">Orbital Period</option>
+            <option value="diameter">Diameter</option>
+            <option value="rotation_period">Rotation Period</option>
+            <option value="surface_water">Surface Water</option>
+          </select>
+          <select
+            data-testid="comparison-filter"
+            name="comparison"
+            id="comparison"
+            value={ comparison }
+            onChange={ (e) => setComparison(e.target.value) }
+          >
+            <option value="greater">Greater Than</option>
+            <option value="lesser">Lesser Than</option>
+            <option value="equal">Equal</option>
+          </select>
+          <input
+            name="number"
+            id="number"
+            type="number"
+            data-testid="value-filter"
+            value={ number }
+            onChange={ (e) => setNumber(e.target.value) }
+          />
+        </label>
+        {/* {selectedFilters?.map((filter, index) => (
+          <>
+            <div key={ index } />
+            <span>
+              {filter.planetData}
+              {' '}
+              {filter.comparison}
+              {' '}
+              {filter.number}
+            </span>
+
+          </>
+        ))} */}
+        <button
+          data-testid="button-filter"
+          onClick={ handleClick }
+        >
+          Filter
+
+        </button>
+      </header>
       <table>
         <thead>
           <tr>

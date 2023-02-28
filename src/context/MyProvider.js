@@ -6,6 +6,7 @@ function MyProvider({ children }) {
   const [planets, setPlanets] = useState([]);
   const [filterPlanets, setFilterPlanets] = useState([]);
   const [filterName, setFilterName] = useState('');
+  const [selectedFilters, setSelectedFilters] = useState([]);
 
   useEffect(() => {
     fetch('https://swapi.dev/api/planets')
@@ -16,6 +17,15 @@ function MyProvider({ children }) {
       });
   }, []);
 
+  const saveFilters = (info) => {
+    setSelectedFilters((state) => {
+      if (state.length) {
+        return [...state, info];
+      }
+      return [info];
+    });
+  };
+
   useEffect(() => {
     if (filterName === '') {
       setFilterPlanets(planets);
@@ -24,8 +34,25 @@ function MyProvider({ children }) {
         .filter((planet) => planet.name
           .includes((filterName)));
       setFilterPlanets(planetsFilterName);
+      const filteredNameNConditions = planetsFilterName.filter((system) => {
+        const filterResults = selectedFilters
+          .map(({ planetData, comparison, number }) => {
+            switch (comparison) {
+            case 'Greater Than':
+              return Number(system[planetData]) > Number(number);
+            case 'Lesser Than':
+              return Number(system[planetData]) < Number(number);
+            case 'Equal':
+              return Number(system[planetData]) === Number(number);
+            default:
+              return true;
+            }
+          });
+        return filterResults.every((el) => el);
+      });
+      return filteredNameNConditions;
     }
-  }, [planets, filterName]);
+  }, [planets, filterName, selectedFilters]);
 
   const context = {
     planets,
@@ -33,6 +60,8 @@ function MyProvider({ children }) {
     filterName,
     setFilterName,
     setFilterPlanets,
+    setSelectedFilters,
+    saveFilters,
   };
 
   return (
