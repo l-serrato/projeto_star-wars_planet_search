@@ -1,97 +1,96 @@
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { render, screen } from '@testing-library/react';
 import App from '../App';
-beforeEach(() => {
-  jest.spyOn(global, 'fetch').mockResolvedValue(
-    { json: jest.fn().mockResolvedValue(testData) },
-  );
-});
+import userEvent from '@testing-library/user-event';
 
-describe('App testes', () => {
-  const NUMERO = '200000';
-  const MAIORQUE = 'maior que';
-  const MENORQUE = 'menor que';
-  const IGUALA = 'igual a';
-  const NAME = 'tatooine'
 
-  test('Verifica se a API é chamada', () => {
-    render(<App />);
-    expect(global.fetch).toHaveBeenCalledTimes(1);
-  });
-  test('Verifica se tem 1 botão na tela', () => {
+const timeOut = delay => 
+  new Promise(resolve => setTimeout(resolve, delay)
+);
+//Fonte do código que utiliza o setTimeOut para aguardar que a Promise se resolva: https://www.30secondsofcode.org/articles/s/javascript-await-timeout
+
+describe("Testes na aplicação Star Wars Planet Search", () => {
+  it('Verifica se os elementos são renderizados corretamente na página inicial', () => {
     render(<App />);
 
-    const buttonElement = screen.queryAllByRole('button');
-    expect(buttonElement.length).toBe(1);
-  });  
+    const nameInput = screen.getByTestId('name-filter');
+    const categorySelect = screen.getByTestId('column-filter');
+    const comparisonSelect = screen.getByTestId('comparison-filter');
+    const valueInput = screen.getByTestId('value-filter');
+    const filterButton = screen.getByTestId('button-filter');
 
-  test('Verifica se os dados são renderizados na tabela com filtro menor que', async () => {
-    render(<App />);
-    await waitFor(() => {
-      expect(screen.getByRole('cell', {name: /Hoth/i})).toBeInTheDocument();    
-    })
-    const value = screen.getByTestId('value-filter');
-    expect(value).toBeInTheDocument();
-    userEvent.clear(screen.getByTestId('value-filter'))
-    userEvent.type(value, NUMERO);
+    expect(nameInput).toBeInTheDocument();
+    expect(categorySelect).toBeInTheDocument();
+    expect(comparisonSelect).toBeInTheDocument();
+    expect(valueInput).toBeInTheDocument();
+    expect(filterButton).toBeInTheDocument();
 
-    userEvent.selectOptions(screen.getByTestId('comparison-filter'), [MENORQUE])
-    expect(screen.getByRole('option', {name: MENORQUE}).selected).toBe(true)
-
-    const button = screen.getByRole('button');
-    userEvent.click(button)
-    expect(screen.getByText('Yavin IV')).toBeInTheDocument();
   });
 
-  test('Verifica se os dados são renderizados na tabela com filtro maior que', async () => {
+  it('Verifica se a tabela foi renderizada com a quantidade correta de linhas e colunas', async () => {
     render(<App />);
-    await waitFor(() => {
-      expect(screen.getByRole('cell', {name: /Hoth/i})).toBeInTheDocument();    
-    })
-    const value = screen.getByTestId('value-filter');
-    expect(value).toBeInTheDocument();
-    userEvent.clear(screen.getByTestId('value-filter'))
-    userEvent.type(value, NUMERO);
 
-    userEvent.selectOptions(screen.getByTestId('comparison-filter'), [MAIORQUE])
-    expect(screen.getByRole('option', {name: MAIORQUE}).selected).toBe(true)
+    await timeOut(2000);
 
-    const button = screen.getByRole('button');
-    userEvent.click(button)
-    expect(screen.getByText('Alderaan')).toBeInTheDocument();
+    const allRows = screen.getAllByRole('row');
+    const allHeaders = screen.getAllByRole('columnheader')
+
+    expect(allRows.length).toBe(11);
+    expect(allHeaders.length).toBe(13);
+
   });
 
-  test('Verifica se os dados são renderizados na tabela com filtro igual a', async () => {
+  it('Verifica se o filtro por nome está funcionando', async () => {
     render(<App />);
-    await waitFor(() => {
-      expect(screen.getByRole('cell', {name: /Hoth/i})).toBeInTheDocument();    
-    })
-    const value = screen.getByTestId('value-filter');
-    expect(value).toBeInTheDocument();
-    userEvent.clear(screen.getByTestId('value-filter'))
-    userEvent.type(value, NUMERO);
 
-    userEvent.selectOptions(screen.getByTestId('comparison-filter'), [IGUALA])
-    expect(screen.getByRole('option', {name: IGUALA}).selected).toBe(true)
+    await timeOut(2000);
 
-    const button = screen.getByRole('button');
-    userEvent.click(button)
-    expect(screen.getByText('Tatooine')).toBeInTheDocument();
-  });
+    const nameInput = screen.getByTestId('name-filter');
 
-  test('Verifica se os dados são renderizados na tabela com filtro name', async () => {
+    expect(nameInput).toBeInTheDocument();
+
+    userEvent.type(nameInput, 'bah');
+
+    const rows = screen.getAllByRole('row');
+    expect(rows.length).toBe(2);
+
+  })
+
+  it('Verifica se o filtro por nome está funcionando', async () => {
     render(<App />);
-    await waitFor(() => {
-      expect(screen.getByRole('cell', {name: /Hoth/i})).toBeInTheDocument();    
-    })
-    const value = screen.getByTestId('name-filter');
-    expect(value).toBeInTheDocument();
-    userEvent.clear(screen.getByTestId('name-filter'))
-    userEvent.type(value, NAME);
 
-    const button = screen.getByRole('button');
-    userEvent.click(button)
-    expect(screen.getByText('Tatooine')).toBeInTheDocument();
-  });
+    await timeOut(2000);
+
+    const nameInput = screen.getByTestId('name-filter');
+
+    expect(nameInput).toBeInTheDocument();
+
+    userEvent.type(nameInput, 't');
+
+
+    const rows = screen.getAllByRole('row');
+    expect(rows.length).toBe(4);
+
+  })
+
+  it('Verifica se o filtro de comparação está funcionando', async () => {
+    render(<App />);
+
+    await timeOut(2000);
+
+    const comparisonSelect = screen.getByTestId('comparison-filter');
+    const valueInput = screen.getByTestId('value-filter');
+    const filterButton = screen.getByTestId('button-filter');
+
+    expect(comparisonSelect).toBeInTheDocument();
+    expect(valueInput).toBeInTheDocument();
+    expect(filterButton).toBeInTheDocument();
+
+    userEvent.selectOptions(comparisonSelect, 'maior que');
+    userEvent.type(valueInput, '2000000000')
+    userEvent.click(filterButton);
+
+    const coruscant = screen.getByRole('cell', { name: /coruscant/i });
+    expect(coruscant).toBeInTheDocument();
+  })
 });
