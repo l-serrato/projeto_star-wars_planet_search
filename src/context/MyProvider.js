@@ -1,73 +1,50 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import PropTypes from 'prop-types';
+import FetchAPI from './FetchAPI';
 import MyContext from './MyContext';
 
 function MyProvider({ children }) {
   const [planets, setPlanets] = useState([]);
-  const [filterPlanets, setFilterPlanets] = useState(planets);
-  const [filterName, setFilterName] = useState('');
-  const [selectedFilters, setSelectedFilters] = useState([]);
+  const [filteredPlanets, setFilteredPlanets] = useState([]);
+  const [inputName, setInputName] = useState('');
+  const [filterByNumericValues, setFilterByNumericValues] = useState([]);
 
   useEffect(() => {
-    fetch('https://swapi.dev/api/planets')
-      .then((data) => data.json())
-      .then((response) => {
-        const dataResults = response.results;
-        setPlanets(dataResults);
+    FetchAPI()
+      .then((data) => {
+        setPlanets(data);
       });
   }, []);
 
-  const saveFilters = (info) => {
-    setSelectedFilters((state) => {
-      if (state.length) {
-        return [...state, info];
-      }
-      return [info];
-    });
-  };
-
   useEffect(() => {
-    const planetsFilterName = planets
-      .filter((planet) => planet.name
-        .includes((filterName)));
-    setFilterPlanets(planetsFilterName);
-  }, [planets, filterName]);
+    const verifyFilterName = () => {
+      const planetsFilteredByName = planets
+        .filter((planet) => (planet.name).toLowerCase()
+          .includes((inputName).toLowerCase()));
+      setFilteredPlanets(planetsFilteredByName);
+    };
 
-  useEffect(() => {
-    const filteredNameNConditions = () => selectedFilters
-      .forEach(({ planetData, comparison, number }) => {
-        setFilterPlanets(
-          (newFilterPlanets) => newFilterPlanets.filter((system) => {
-            switch (comparison) {
-            case 'maior que':
-              return Number(system[planetData]) > Number(number);
-            case 'menor que':
-              return Number(system[planetData]) < Number(number);
-            case 'igual a':
-              return Number(system[planetData]) === Number(number);
-            default:
-              return true;
-            }
-          }),
-        );
-      });
-    filteredNameNConditions();
-  }, [filterName, selectedFilters]);
+    if (inputName) {
+      verifyFilterName();
+    } else {
+      setFilteredPlanets(planets);
+    }
+  }, [planets, inputName]);
 
-  const context = {
-    planets,
-    filterPlanets,
-    filterName,
-    setFilterName,
-    setFilterPlanets,
-    setSelectedFilters,
-    saveFilters,
-    selectedFilters,
-  };
+  const context = useMemo(() => ({
+    filteredPlanets,
+    filterByNumericValues,
+    setInputName,
+    setFilterByNumericValues,
+    setFilteredPlanets,
+  }), [
+    filteredPlanets,
+    filterByNumericValues,
+  ]);
 
   return (
     <MyContext.Provider value={ context }>
-      { children }
+      {children}
     </MyContext.Provider>
   );
 }

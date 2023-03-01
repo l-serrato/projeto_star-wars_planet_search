@@ -1,100 +1,34 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext } from 'react';
 import MyContext from '../context/MyContext';
 
 export default function Table() {
   const {
-    filterPlanets,
-    setFilterName,
-    saveFilters,
-    selectedFilters } = useContext(MyContext);
-  const [planetData, setPlanetData] = useState('population');
-  const [comparison, setComparison] = useState('maior que');
-  const [number, setNumber] = useState('');
-  const handleClick = () => {
-    const info = {
-      planetData,
-      comparison,
-      number,
-    };
-    saveFilters(info);
+    filteredPlanets,
+    filterByNumericValues,
+  } = useContext(MyContext);
+
+  const showFilteredPlanets = () => {
+    const filterByComparison = filteredPlanets.filter((planet) => {
+      const filterPlanetByComparison = filterByNumericValues
+        .map(({ category, comparison, value }) => {
+          switch (comparison) {
+          case 'maior que':
+            return Number(planet[category]) > Number(value);
+          case 'menor que':
+            return Number(planet[category]) < Number(value);
+          case 'igual a':
+            return Number(planet[category]) === Number(value);
+          default:
+            return true;
+          }
+        });
+      return filterPlanetByComparison.every((item) => item);
+    });
+    return filterByComparison;
   };
-  function refreshPage() {
-    window.location.reload();
-  }
+
   return (
     <section>
-      <header>
-        <label>
-          Search Planet:
-          <input
-            type="text"
-            data-testid="name-filter"
-            onChange={ ({ target: { value } }) => setFilterName(value) }
-          />
-        </label>
-        <label htmlFor="planetData">
-          Planet Data:
-          <select
-            data-testid="column-filter"
-            name="planetData"
-            id="planetData"
-            value={ planetData }
-            onChange={ (e) => setPlanetData(e.target.value) }
-          >
-            <option value="population">population</option>
-            <option value="orbital_period">orbital_period</option>
-            <option value="diameter">diameter</option>
-            <option value="rotation_period">rotation_period</option>
-            <option value="surface_water">surface_water</option>
-          </select>
-          <select
-            data-testid="comparison-filter"
-            name="comparison"
-            id="comparison"
-            value={ comparison }
-            onChange={ (e) => setComparison(e.target.value) }
-          >
-            <option value="maior que">maior que</option>
-            <option value="menor que">menor que</option>
-            <option value="igual a">igual a</option>
-          </select>
-          <input
-            name="number"
-            id="number"
-            type="number"
-            data-testid="value-filter"
-            value={ number }
-            onChange={ (e) => setNumber(e.target.value) }
-          />
-        </label>
-        <button
-          data-testid="button-filter"
-          onClick={ handleClick }
-        >
-          Filter
-
-        </button>
-        {selectedFilters.map((filter, index) => (
-          <div key={ index }>
-            <span>
-              {filter.planetData}
-              {' '}
-              {filter.comparison}
-              {' '}
-              {filter.number}
-              {' '}
-              <button>X</button>
-            </span>
-          </div>
-        ))}
-        <button
-          data-testid="button-remove-filters"
-          onClick={ refreshPage }
-        >
-          Remover todas as filtragens
-
-        </button>
-      </header>
       <table>
         <thead>
           <tr>
@@ -114,7 +48,7 @@ export default function Table() {
           </tr>
         </thead>
         <tbody>
-          {filterPlanets?.map((planet, index1) => (
+          {showFilteredPlanets().map((planet, index1) => (
             <tr key={ index1 }>
               <td>
                 { planet.name }
