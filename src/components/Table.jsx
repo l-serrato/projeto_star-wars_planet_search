@@ -5,10 +5,11 @@ export default function Table() {
   const {
     filterPlanets,
     setFilterName,
-    saveFilters } = useContext(MyContext);
+    saveFilters,
+    selectedFilters } = useContext(MyContext);
   const [planetData, setPlanetData] = useState('population');
   const [comparison, setComparison] = useState('maior que');
-  const [number, setNumber] = useState(0);
+  const [number, setNumber] = useState('');
   const handleClick = () => {
     const info = {
       planetData,
@@ -17,6 +18,9 @@ export default function Table() {
     };
     saveFilters(info);
   };
+  function refreshPage() {
+    window.location.reload();
+  }
   return (
     <section>
       <header>
@@ -63,24 +67,31 @@ export default function Table() {
             onChange={ (e) => setNumber(e.target.value) }
           />
         </label>
-        {/* {selectedFilters?.map((filter, index) => (
-          <>
-            <div key={ index } />
+        <button
+          data-testid="button-filter"
+          onClick={ handleClick }
+        >
+          Filter
+
+        </button>
+        {selectedFilters.map((filter, index) => (
+          <div key={ index }>
             <span>
               {filter.planetData}
               {' '}
               {filter.comparison}
               {' '}
               {filter.number}
+              {' '}
+              <button>X</button>
             </span>
-
-          </>
-        ))} */}
+          </div>
+        ))}
         <button
-          data-testid="button-filter"
-          onClick={ handleClick }
+          data-testid="button-remove-filters"
+          onClick={ refreshPage }
         >
-          Filter
+          Remover todas as filtragens
 
         </button>
       </header>

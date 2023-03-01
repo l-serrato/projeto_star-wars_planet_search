@@ -62,6 +62,7 @@ function MyProvider({ children }) {
     setFilterPlanets,
     setSelectedFilters,
     saveFilters,
+    selectedFilters,
   };
 
   return (
