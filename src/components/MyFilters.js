@@ -25,7 +25,7 @@ export default function NameFilter() {
   const [inputValues, setInputValues] = useState({
     category: 'population',
     comparison: 'maior que',
-    value: ' ',
+    value: '0',
   });
 
   const [filterValues, setFilterValues] = useState(categoryOptions);
