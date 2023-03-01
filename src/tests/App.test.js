@@ -7,7 +7,6 @@ import userEvent from '@testing-library/user-event';
 const timeOut = delay => 
   new Promise(resolve => setTimeout(resolve, delay)
 );
-//Fonte do código que utiliza o setTimeOut para aguardar que a Promise se resolva: https://www.30secondsofcode.org/articles/s/javascript-await-timeout
 
 describe("Testes na aplicação Star Wars Planet Search", () => {
   it('Verifica se os elementos são renderizados corretamente na página inicial', () => {
@@ -93,4 +92,47 @@ describe("Testes na aplicação Star Wars Planet Search", () => {
     const coruscant = screen.getByRole('cell', { name: /coruscant/i });
     expect(coruscant).toBeInTheDocument();
   })
+
+  it('Verifica se o filtro de comparação está funcionando', async () => {
+    render(<App />);
+
+    await timeOut(2000);
+
+    const comparisonSelect = screen.getByTestId('comparison-filter');
+    const valueInput = screen.getByTestId('value-filter');
+    const filterButton = screen.getByTestId('button-filter');
+
+    expect(comparisonSelect).toBeInTheDocument();
+    expect(valueInput).toBeInTheDocument();
+    expect(filterButton).toBeInTheDocument();
+
+    userEvent.selectOptions(comparisonSelect, 'menor que');
+    userEvent.type(valueInput, '2000000000000	')
+    userEvent.click(filterButton);
+
+    const coruscant = screen.getAllByRole('row');
+    expect(coruscant).toHaveLength(1);
+  })
+
+  it('Verifica se o filtro de comparação está funcionando', async () => {
+    render(<App />);
+
+    await timeOut(2000);
+
+    const comparisonSelect = screen.getByTestId('comparison-filter');
+    const valueInput = screen.getByTestId('value-filter');
+    const filterButton = screen.getByTestId('button-filter');
+
+    expect(comparisonSelect).toBeInTheDocument();
+    expect(valueInput).toBeInTheDocument();
+    expect(filterButton).toBeInTheDocument();
+
+    userEvent.selectOptions(comparisonSelect, 'igual a');
+    userEvent.type(valueInput, '1000000000000')
+    userEvent.click(filterButton);
+
+    const coruscant = screen.getAllByRole('row');
+    expect(coruscant).toHaveLength(1);
+  })
 });
+
