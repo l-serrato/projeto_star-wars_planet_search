@@ -4,7 +4,7 @@ import MyContext from './MyContext';
 
 function MyProvider({ children }) {
   const [planets, setPlanets] = useState([]);
-  const [filterPlanets, setFilterPlanets] = useState([]);
+  const [filterPlanets, setFilterPlanets] = useState(planets);
   const [filterName, setFilterName] = useState('');
   const [selectedFilters, setSelectedFilters] = useState([]);
 
@@ -27,32 +27,32 @@ function MyProvider({ children }) {
   };
 
   useEffect(() => {
-    if (filterName === '') {
-      setFilterPlanets(planets);
-    } else {
-      const planetsFilterName = planets
-        .filter((planet) => planet.name
-          .includes((filterName)));
-      setFilterPlanets(planetsFilterName);
-      const filteredNameNConditions = planetsFilterName.filter((system) => {
-        const filterResults = selectedFilters
-          .map(({ planetData, comparison, number }) => {
+    const planetsFilterName = planets
+      .filter((planet) => planet.name
+        .includes((filterName)));
+    setFilterPlanets(planetsFilterName);
+  }, [planets, filterName]);
+
+  useEffect(() => {
+    const filteredNameNConditions = () => selectedFilters
+      .forEach(({ planetData, comparison, number }) => {
+        setFilterPlanets(
+          (newFilterPlanets) => newFilterPlanets.filter((system) => {
             switch (comparison) {
-            case 'Greater Than':
+            case 'maior que':
               return Number(system[planetData]) > Number(number);
-            case 'Lesser Than':
+            case 'menor que':
               return Number(system[planetData]) < Number(number);
-            case 'Equal':
+            case 'igual a':
               return Number(system[planetData]) === Number(number);
             default:
               return true;
             }
-          });
-        return filterResults.every((el) => el);
+          }),
+        );
       });
-      return filteredNameNConditions;
-    }
-  }, [planets, filterName, selectedFilters]);
+    filteredNameNConditions();
+  }, [filterName, selectedFilters]);
 
   const context = {
     planets,
